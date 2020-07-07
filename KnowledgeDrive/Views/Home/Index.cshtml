@@ -1,0 +1,110 @@
+﻿@model KnowhowDrive.Models.HomeViewModel;
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 class="display-4">knowhow Drive</h1>
+            <br />
+            <div class="input-group mb-3">
+                <input type="text" id="txtSearchKeyword" class="form-control" placeholder="Enter File Name" aria-label="Enter File Name" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-dark" id="btnSearch" type="button">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <hr />
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-lg-12">
+
+            <table class="table table-hover table-striped table-dark table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Title</th>
+                        <th scope="col">URL</th>
+                    </tr>
+                </thead>
+                <tbody id="myTable">
+
+                    @if (Model != null && Model.files != null)
+                    {
+                        foreach (var item in Model.files)
+                        {
+                            <tr>
+                                <td>@item.title</td>
+                                <td><a href="@item.sharableLink" class="btn btn-primary btn-large">Open file</a></td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="2">No records found.</td>
+
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#txtSearchKeyword").keyup(function (event) {
+            searchKeyword();
+        });
+
+        $("#btnSearch").click(function (event) { searchKeyword(); });
+    });
+
+    function searchKeyword() {
+        var enteredText = $("#txtSearchKeyword").val();
+
+        $.ajax({
+            url: '/Home/SearchKeyword?keyword=' + enteredText,
+            type: "get",
+            success: function (result) {
+
+                if (result.success) {
+                    var tblHtml = '';
+                    if (result.data.length == 0) {
+                        $("#lblMessage").html("<span style='color:red;'>No records found.</span > ");
+                        tblHtml = ' <tr><td colspan="2">No records found.</td></tr>';
+                        $("#myTable").html(tblHtml);
+                        return;
+                    }
+
+                    $.each(result.data, function (b, a) {
+                        tblHtml += ' <tr><td>' + a.title + '</td><td><a href="' + a.sharableLink + '" class="btn btn-primary btn-large">Link</a></td></tr>';
+                    });
+
+                    $("#myTable").html(tblHtml);
+                    $("#lblMessage").html(result.data.length + " files listed");
+                }
+                else {
+                    $("#lblMessage").html("<span style='color:red;'>An error occured: " + result.message + "</span>");
+                }
+
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(thrownError);
+            }
+        });
+
+    }
+
+</script>

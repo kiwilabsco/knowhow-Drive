@@ -1,0 +1,26 @@
+
+{
+    "comment" : "This file is used to help set default values when using the dotnet CLI extension Amazon.ElasticBeanstalk.Tools. For more information run \"dotnet eb --help\" from the project root.",
+    "profile" : "kwl-kerem",
+    "region"  : "eu-central-1",
+    "application" : "KnowledgeDrive",
+    "environment" : "KnowledgeDrive",
+    "cname"       : "knowledgedrive",
+    "solution-stack" : "64bit Amazon Linux 2 v1.0.0 running .NET Core",
+    "environment-type" : "LoadBalanced",
+    "instance-profile" : "aws-elasticbeanstalk-ec2-role",
+    "service-role"     : "aws-elasticbeanstalk-service-role",
+    "health-check-url" : "/",
+    "instance-type"    : "t2.micro",
+    "key-pair"         : "kwlkeypair",
+    "iis-website"      : "Default Web Site",
+    "app-path"         : "/",
+    "enable-xray"      : false,
+    "configuration"    : "Debug",
+    "framework"        : "netcoreapp3.1",
+    "self-contained"   : false,
+    "enhanced-health-type" : "basic",
+    "additional-options"   : "",
+    "proxy-server"         : "nginx",
+    "loadbalancer-type"    : "application"
+}

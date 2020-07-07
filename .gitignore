@@ -338,3 +338,5 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/alb-http-to-https-redirection.config
+/KnowledgeDrive/aws-beanstalk-tools-defaults.json
