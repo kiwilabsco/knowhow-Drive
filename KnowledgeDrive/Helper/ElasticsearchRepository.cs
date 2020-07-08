@@ -76,15 +76,10 @@ namespace KnowhowDrive.Helper
                 var resp = client.Search<KnowhowDrive.Models.DriveItemModel>(s => s
                     .Index("drive")
                         .Query(q => q.Bool(b => b.Must(
-                                m => m.Regexp(t => t.Field("title").Value(".*" + first_word + ".*")) &&
-                                m.Regexp(tq => tq.Field("content").Value(".*" + first_word + ".*")) &&
-                                (!string.IsNullOrEmpty(second_word) ? m.Regexp(t => t.Field("title").Value(".*" + second_word + ".*")):null) &&
+                                m => m.Regexp(tq => tq.Field("content").Value(".*" + first_word + ".*")) &&
                                 (!string.IsNullOrEmpty(second_word) ?m.Regexp(t => t.Field("content").Value(".*" + second_word + ".*")) : null) &&
-                                (!string.IsNullOrEmpty(third_word) ?m.Regexp(t => t.Field("title").Value(".*" + third_word + ".*")) : null) &&
                                 (!string.IsNullOrEmpty(third_word) ?m.Regexp(t => t.Field("content").Value(".*" + third_word + ".*")) : null) &&
-                                (!string.IsNullOrEmpty(fourth_word) ?m.Regexp(t => t.Field("title").Value(".*" + fourth_word + ".*")) : null) &&
                                 (!string.IsNullOrEmpty(fourth_word) ?m.Regexp(t => t.Field("content").Value(".*" + fourth_word + ".*")) : null) &&
-                                (!string.IsNullOrEmpty(fifth_word) ?m.Regexp(t => t.Field("title").Value(".*" + fifth_word + ".*")) : null) &&
                                 (!string.IsNullOrEmpty(fifth_word) ? m.Regexp(t => t.Field("content").Value(".*" + fifth_word + ".*")) : null)
                                  
                                 ))));
