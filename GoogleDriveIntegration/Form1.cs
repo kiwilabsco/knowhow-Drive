@@ -53,7 +53,14 @@ namespace GoogleDriveIntegration
                 foreach (var file in files.Data)
                 {
                     if (file.MimeType == "application/vnd.google-apps.folder") //Fetch contents of folder
-                        allFiles.AddRange(getFilesFromDriveFolder(file.Id).Data);
+                        try 
+                        {
+                            allFiles.AddRange(getFilesFromDriveFolder(file.Id).Data);
+                        }
+                        catch (Exception) //Folder is probably empty.
+                        {
+
+                        }
 
                     else
                         allFiles.Add(file);
