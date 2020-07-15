@@ -18,9 +18,9 @@ namespace GoogleDriveIntegration.Helper
         private string[] Scopes = { DriveService.Scope.Drive };
         private string ApplicationName = "knowhow Drive";
 
-        public void DownloadFile(string blobId, string savePath)
+        public void DownloadFile(string blobId, string savePath, string credPath)
         {
-            var service = GetDriveServiceInstance();
+            var service = GetDriveServiceInstance(credPath);
             var request = service.Files.Get(blobId);
             var stream = new MemoryStream();
             // Add a handler which will be notified on progress changes.
@@ -51,22 +51,22 @@ namespace GoogleDriveIntegration.Helper
             request.Download(stream);
         }
 
-        public string getContentsFromFile(string itemID, string mimetype)
+        public string getContentsFromFile(string itemID, string mimetype, string credPath)
         {
 
-            FilesResource.ExportRequest exportRequest = GetDriveServiceInstance().Files.Export(itemID, "text/plain");
+            FilesResource.ExportRequest exportRequest = GetDriveServiceInstance(credPath).Files.Export(itemID, "text/plain");
 
             var result = exportRequest.Execute();
 
             return result;
         }
 
-        public Response<List<Google.Apis.Drive.v3.Data.File>> getFilesFromDriveFolder(string folderID)
+        public Response<List<Google.Apis.Drive.v3.Data.File>> getFilesFromDriveFolder(string folderID, string credPath)
         {
             try
             {
 
-                FilesResource.ListRequest listRequest = GetDriveServiceInstance().Files.List();
+                FilesResource.ListRequest listRequest = GetDriveServiceInstance(credPath).Files.List();
                 listRequest.Q = "'" + folderID + "' in parents"; //Get contents of folder using file ID. 
                 listRequest.PageSize = 100;
                 listRequest.Fields = "nextPageToken, files(id, name, webViewLink, size, mimeType)";
@@ -90,9 +90,9 @@ namespace GoogleDriveIntegration.Helper
             }
         }
 
-        public string UploadFile(string path)
+        public string UploadFile(string path, string credPath)
         {
-            var service = GetDriveServiceInstance();
+            var service = GetDriveServiceInstance(credPath);
             var fileMetadata = new Google.Apis.Drive.v3.Data.File();
             fileMetadata.Name = Path.GetFileName(path);
             fileMetadata.MimeType = "image/jpeg";
@@ -134,15 +134,15 @@ namespace GoogleDriveIntegration.Helper
             });
             return service;
         }
-        private DriveService GetDriveServiceInstance()
+        private DriveService GetDriveServiceInstance(string credPath)
         {
             UserCredential credential;
 
             using (var stream =
-                new FileStream("credentials.json", FileMode.Open, FileAccess.Read))
+                new FileStream(credPath, FileMode.Open, FileAccess.Read))
             {
-                //string credPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-                string credPath = AppDomain.CurrentDomain.BaseDirectory+"\\token.json";
+                string credPath1 = Environment.GetFolderPath(Environment.SpecialFolder.Personal)+ "\\token.json";
+                //string credPath = AppDomain.CurrentDomain.BaseDirectory+"\\token.json";
                 //credPath = Path.Combine(credPath, "./credentials/credentials.json");
 
                 credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
@@ -150,7 +150,7 @@ namespace GoogleDriveIntegration.Helper
                     Scopes,
                     "user",
                     CancellationToken.None,
-                    new FileDataStore(credPath, true)).Result;
+                    new FileDataStore(credPath1, true)).Result;
             }
 
             var service = new DriveService(new BaseClientService.Initializer()
@@ -170,12 +170,12 @@ namespace GoogleDriveIntegration.Helper
             }
         }
 
-        public Response<string> getSpecificFolderFromName(string folderName)
+        public Response<string> getSpecificFolderFromName(string folderName, string credPath)
         {
             try
             {
 
-                FilesResource.ListRequest listRequest = GetDriveServiceInstance().Files.List();
+                FilesResource.ListRequest listRequest = GetDriveServiceInstance(credPath).Files.List();
                 listRequest.PageSize = 100;
                 listRequest.Fields = "nextPageToken, files(id, name, webViewLink, size, mimeType)";
 

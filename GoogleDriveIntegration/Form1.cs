@@ -19,6 +19,7 @@ namespace GoogleDriveIntegration
         public Form1()
         {
             InitializeComponent();
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -26,8 +27,9 @@ namespace GoogleDriveIntegration
             lblStatus.Text = "Loading files...";
             button1.Enabled = false;
             var folderName = tbFolderName.Text;
+            var credPath = tbCredentialsPath.Text;
 
-            var responseRefresh = RefreshDriveData(folderName);
+            var responseRefresh = RefreshDriveData(folderName, credPath);
 
             lblStatus.Text = "Done: " + responseRefresh.Message;
             button1.Enabled = true;
@@ -35,27 +37,27 @@ namespace GoogleDriveIntegration
         }
 
 
-        private Response<bool> RefreshDriveData(string folderName)
+        private Response<bool> RefreshDriveData(string folderName, string credPath)
         {
             #region Read files from Drive
             //Create a new list
             var allFiles = new List<Google.Apis.Drive.v3.Data.File>();
             //Get all files in the folder
-            var folderID = getSpecificFolderFromName(folderName);
+            var folderID = getSpecificFolderFromName(folderName, credPath);
             if (!folderID.Success)
             {
                 return new Response<bool>() { Success = false, Message = folderID.Message };
             }
-            var files = getFilesFromDriveFolder(folderID.Data);
+            var files = getFilesFromDriveFolder(folderID.Data, credPath);
             //Check if file exists
             if (files != null && files.Data.Count > 0)
             {
                 foreach (var file in files.Data)
                 {
                     if (file.MimeType == "application/vnd.google-apps.folder") //Fetch contents of folder
-                        try 
+                        try
                         {
-                            allFiles.AddRange(getFilesFromDriveFolder(file.Id).Data);
+                            allFiles.AddRange(getFilesFromDriveFolder(file.Id, credPath).Data);
                         }
                         catch (Exception) //Folder is probably empty.
                         {
@@ -82,7 +84,7 @@ namespace GoogleDriveIntegration
                 string fileContents = "";
                 try
                 {
-                    fileContents = getContentsFromFile(item.Id, item.MimeType);
+                    fileContents = getContentsFromFile(item.Id, item.MimeType, credPath);
                 }
                 catch (Exception) { }
 
@@ -100,24 +102,24 @@ namespace GoogleDriveIntegration
             return new Response<bool>() { Success = true, Message = "All files are inserted to Elasticsearch." };
         }
 
-        public Response<List<Google.Apis.Drive.v3.Data.File>> getFilesFromDriveFolder(String folderID)
+        public Response<List<Google.Apis.Drive.v3.Data.File>> getFilesFromDriveFolder(string folderID, string credPath)
         {
-            return new GoogleDriveAPI().getFilesFromDriveFolder(folderID);
+            return new GoogleDriveAPI().getFilesFromDriveFolder(folderID, credPath);
 
 
         }
 
 
-        public Response<string> getSpecificFolderFromName(string folderName)
+        public Response<string> getSpecificFolderFromName(string folderName, string credPath)
         {
-            return new GoogleDriveAPI().getSpecificFolderFromName(folderName);
+            return new GoogleDriveAPI().getSpecificFolderFromName(folderName, credPath);
 
 
         }
 
-        public string getContentsFromFile(string itemID, string mimetype)
+        public string getContentsFromFile(string itemID, string mimetype, string credPath)
         {
-            return new GoogleDriveAPI().getContentsFromFile(itemID, mimetype);
+            return new GoogleDriveAPI().getContentsFromFile(itemID, mimetype, credPath);
 
 
         }
@@ -139,9 +141,15 @@ namespace GoogleDriveIntegration
 
         }
 
-        private void label1_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         {
+            OpenFileDialog dialog = new OpenFileDialog();
 
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                tbCredentialsPath.Text = dialog.FileName;
+                tbFolderName.Focus();
+            }
         }
     }
 }
